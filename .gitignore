@@ -1,0 +1,12 @@
+/node_modules
+/.next/
+/out/
+.env
+.env*.local
+*.db
+*.db-journal
+/android/
+/resources/*.png
+*.apk
+/public/uploads/*
+!/public/uploads/.gitkeep

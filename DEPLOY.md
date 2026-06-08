@@ -23,27 +23,28 @@ La app quedará en una URL pública tipo `https://workgo1234.vercel.app` sin dep
 
 5. Clic en **Deploy** (espera 2-3 minutos)
 
-## Paso 3 — Vercel Blob (subida de PDFs)
+## Paso 3 — Cargar datos demo (sin terminal)
+
+Después del deploy, abre en tu navegador:
+
+```
+https://workgo1234-a6gq.vercel.app/setup
+```
+
+1. Deja la clave: `workgo2026`
+2. Pulsa **"Cargar datos demo"**
+3. Listo — empleos y cuentas creados
+
+## Paso 4 — Vercel Blob (subida de PDFs, opcional)
 
 1. En tu proyecto Vercel → **Storage** → **Create Database** → **Blob**
 2. Conecta Blob al proyecto
 3. Vercel agrega `BLOB_READ_WRITE_TOKEN` automáticamente
 4. **Redeploy** el proyecto (Deployments → ⋯ → Redeploy)
 
-## Paso 4 — Datos demo
-
-Después del primer deploy, ejecuta el seed **una vez** contra la BD de producción:
-
-```powershell
-cd "d:\Work Go\onni-jobs"
-$env:DATABASE_URL="postgresql://..."   # tu URL de Neon
-npm run db:push
-npm run db:seed
-```
-
 ## Paso 5 — APK apuntando a internet
 
-Cuando tengas tu URL de Vercel (ej. `https://workgo1234.vercel.app`):
+Cuando tengas tu URL de Vercel (ej. `https://workgo1234-a6gq.vercel.app`):
 
 ```powershell
 $env:CAPACITOR_SERVER_URL="https://workgo1234.vercel.app"

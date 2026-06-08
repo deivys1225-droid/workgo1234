@@ -2,7 +2,17 @@
 
 Plataforma de contratación local inteligente con geolocalización en tiempo real.
 
-## Inicio rápido
+## Desplegar en internet (sin depender de tu PC)
+
+Guía completa en **[DEPLOY.md](./DEPLOY.md)** — Vercel + Neon PostgreSQL (gratis).
+
+Resumen:
+1. Crea base de datos en **https://neon.tech**
+2. Importa el repo en **https://vercel.com** → conecta GitHub
+3. Agrega variables `DATABASE_URL` y `JWT_SECRET`
+4. Deploy → tu app queda en `https://tu-proyecto.vercel.app`
+
+## Inicio rápido (local)
 
 ```bash
 npm install

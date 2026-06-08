@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { put } from "@vercel/blob";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -25,17 +26,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let resumeUrl: string;
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadsDir, { recursive: true });
-
-    const filename = `${session.userId}-${Date.now()}.pdf`;
-    const filepath = path.join(uploadsDir, filename);
-    await writeFile(filepath, buffer);
-
-    const resumeUrl = `/uploads/${filename}`;
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      const filename = `resumes/${session.userId}-${Date.now()}.pdf`;
+      const blob = await put(filename, file, {
+        access: "public",
+        contentType: "application/pdf",
+      });
+      resumeUrl = blob.url;
+    } else {
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const uploadsDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadsDir, { recursive: true });
+      const filename = `${session.userId}-${Date.now()}.pdf`;
+      await writeFile(path.join(uploadsDir, filename), buffer);
+      resumeUrl = `/uploads/${filename}`;
+    }
 
     await prisma.profile.update({
       where: { userId: session.userId },

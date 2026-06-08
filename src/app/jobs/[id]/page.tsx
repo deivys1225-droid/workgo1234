@@ -12,15 +12,15 @@ import {
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ApplyButton } from "@/components/jobs/ApplyButton";
-import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
+import { getJob } from "@/lib/store";
 import {
   formatSalary,
   formatDistance,
   workTypeLabel,
   parseJsonObject,
 } from "@/lib/utils";
-import { getDistanceMeters, DEFAULT_LOCATION } from "@/lib/geo";
+import { DEFAULT_LOCATION } from "@/lib/geo";
 
 export default async function JobDetailPage({
   params,
@@ -30,27 +30,8 @@ export default async function JobDetailPage({
   const { id } = await params;
   const session = await getSession();
 
-  const job = await prisma.job.findUnique({
-    where: { id },
-    include: {
-      employer: { include: { profile: true } },
-      applications: session
-        ? { where: { candidateId: session.userId }, select: { id: true } }
-        : false,
-    },
-  });
-
+  const job = getJob(id, DEFAULT_LOCATION.lat, DEFAULT_LOCATION.lng);
   if (!job) notFound();
-
-  const distance =
-    job.lat && job.lng
-      ? getDistanceMeters(
-          DEFAULT_LOCATION.lat,
-          DEFAULT_LOCATION.lng,
-          job.lat,
-          job.lng
-        )
-      : undefined;
 
   const requirements = parseJsonObject<{
     resume?: boolean;
@@ -60,17 +41,13 @@ export default async function JobDetailPage({
 
   const alreadyApplied =
     session?.role === "candidate" &&
-    Array.isArray(job.applications) &&
-    job.applications.length > 0;
+    job.applications?.some((a) => a.candidateId === session.userId);
 
-  const profile = job.employer.profile;
+  const profile = job.employer?.profile;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link
-        href="/jobs"
-        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-6"
-      >
+      <Link href="/jobs" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mb-6">
         <ArrowLeft className="h-4 w-4" />
         Volver a empleos
       </Link>
@@ -78,12 +55,7 @@ export default async function JobDetailPage({
       <GlassCard className="overflow-hidden">
         <div className="relative h-48 sm:h-64 bg-gradient-to-br from-primary-100 to-blue-50">
           {job.imageUrl ? (
-            <Image
-              src={job.imageUrl}
-              alt={job.title}
-              fill
-              className="object-cover"
-            />
+            <Image src={job.imageUrl} alt={job.title} fill className="object-cover" />
           ) : (
             <div className="flex h-full items-center justify-center">
               <Building2 className="h-16 w-16 text-primary-300" />
@@ -92,9 +64,7 @@ export default async function JobDetailPage({
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute bottom-4 left-4 right-4">
             <Badge status={job.workType === "remote" ? "active" : "pending"} />
-            <h1 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
-              {job.title}
-            </h1>
+            <h1 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">{job.title}</h1>
           </div>
         </div>
 
@@ -104,10 +74,8 @@ export default async function JobDetailPage({
               <span className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-primary-500" />
                 {job.locationLabel}
-                {distance !== undefined && (
-                  <span className="text-primary-600 font-medium">
-                    ({formatDistance(distance)})
-                  </span>
+                {job.distance !== undefined && (
+                  <span className="text-primary-600 font-medium">({formatDistance(job.distance)})</span>
                 )}
               </span>
             )}
@@ -124,88 +92,33 @@ export default async function JobDetailPage({
           {profile && (
             <div className="mt-6 flex items-center gap-3 rounded-xl bg-gray-50/80 p-4">
               {profile.avatarUrl ? (
-                <Image
-                  src={profile.avatarUrl}
-                  alt={profile.fullName}
-                  width={48}
-                  height={48}
-                  className="rounded-full object-cover"
-                />
+                <Image src={profile.avatarUrl} alt={profile.fullName} width={48} height={48} className="rounded-full object-cover" />
               ) : (
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-600">
                   <Building2 className="h-6 w-6" />
                 </div>
               )}
               <div>
-                <p className="font-medium text-gray-900">
-                  {profile.companyName || profile.fullName}
-                </p>
-                {profile.bio && (
-                  <p className="text-sm text-gray-500 line-clamp-1">
-                    {profile.bio}
-                  </p>
-                )}
+                <p className="font-medium text-gray-900">{profile.companyName || profile.fullName}</p>
+                {profile.bio && <p className="text-sm text-gray-500 line-clamp-1">{profile.bio}</p>}
               </div>
             </div>
           )}
 
           <div className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-gray-900">
-              Descripción
-            </h2>
-            <p className="mt-3 text-gray-600 leading-relaxed whitespace-pre-line">
-              {job.description}
-            </p>
+            <h2 className="font-display text-lg font-semibold text-gray-900">Descripción</h2>
+            <p className="mt-3 text-gray-600 leading-relaxed whitespace-pre-line">{job.description}</p>
           </div>
-
-          {(requirements.resume ||
-            requirements.experience ||
-            (requirements.documents && requirements.documents.length > 0)) && (
-            <div className="mt-8">
-              <h2 className="font-display text-lg font-semibold text-gray-900">
-                Requisitos
-              </h2>
-              <ul className="mt-3 space-y-2">
-                {requirements.resume && (
-                  <li className="flex items-center gap-2 text-sm text-gray-600">
-                    <FileText className="h-4 w-4 text-primary-500" />
-                    Hoja de vida requerida
-                  </li>
-                )}
-                {requirements.experience && (
-                  <li className="flex items-center gap-2 text-sm text-gray-600">
-                    <Clock className="h-4 w-4 text-primary-500" />
-                    Experiencia: {requirements.experience}
-                  </li>
-                )}
-                {requirements.documents?.map((doc) => (
-                  <li
-                    key={doc}
-                    className="flex items-center gap-2 text-sm text-gray-600"
-                  >
-                    <FileText className="h-4 w-4 text-primary-500" />
-                    {doc}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             {session?.role === "candidate" ? (
-              <ApplyButton
-                jobId={job.id}
-                jobTitle={job.title}
-                alreadyApplied={!!alreadyApplied}
-              />
+              <ApplyButton jobId={job.id} jobTitle={job.title} alreadyApplied={!!alreadyApplied} />
             ) : session?.role === "employer" ? (
-              <p className="text-sm text-gray-500">
-                Inicia sesión como candidato para postularte
-              </p>
+              <p className="text-sm text-gray-500">Entra como candidato para postularte</p>
             ) : (
               <Link href={`/login?redirect=/jobs/${job.id}`}>
-                <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-7 py-3 text-base font-medium text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-700">
-                  Iniciar sesión para postularme
+                <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-7 py-3 text-base font-medium text-white shadow-lg shadow-primary-600/25 hover:bg-primary-700">
+                  Entrar para postularme
                 </button>
               </Link>
             )}

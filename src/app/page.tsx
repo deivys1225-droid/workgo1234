@@ -11,36 +11,18 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { prisma } from "@/lib/prisma";
+import { getJobs } from "@/lib/store";
 import { getDistanceMeters, DEFAULT_LOCATION } from "@/lib/geo";
 import { JobCard } from "@/components/jobs/JobCard";
 
-export default async function HomePage() {
-  const jobs = await prisma.job.findMany({
-    where: { status: "active" },
-    include: { employer: { include: { profile: true } } },
-    take: 6,
-    orderBy: { createdAt: "desc" },
-  });
-
-  const jobsWithDistance = jobs
-    .map((job) => ({
-      ...job,
-      distance:
-        job.lat && job.lng
-          ? getDistanceMeters(
-              DEFAULT_LOCATION.lat,
-              DEFAULT_LOCATION.lng,
-              job.lat,
-              job.lng
-            )
-          : undefined,
-    }))
-    .sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+export default function HomePage() {
+  const jobsWithDistance = getJobs({
+    lat: DEFAULT_LOCATION.lat,
+    lng: DEFAULT_LOCATION.lng,
+  }).slice(0, 6);
 
   return (
     <>
-      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <Image
@@ -57,7 +39,7 @@ export default async function HomePage() {
           <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-sm text-primary-600">
               <Zap className="h-4 w-4" />
-              Contratación local inteligente
+              Proyecto escolar — contratación local
             </div>
             <h1 className="font-display text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
               Encuentra empleos{" "}
@@ -65,8 +47,7 @@ export default async function HomePage() {
             </h1>
             <p className="mt-6 text-lg text-gray-600 leading-relaxed">
               Work Go conecta empleadores con talento local usando
-              geolocalización en tiempo real. Postúlate en 3 clics y encuentra
-              tu próximo trabajo a la vuelta de la esquina.
+              geolocalización. Demo interactiva sin base de datos ni registro.
             </p>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link href="/jobs">
@@ -75,10 +56,10 @@ export default async function HomePage() {
                   Buscar empleos
                 </Button>
               </Link>
-              <Link href="/register?role=employer">
+              <Link href="/login">
                 <Button variant="secondary" size="lg" className="gap-2">
                   <Briefcase className="h-5 w-5" />
-                  Publicar oferta
+                  Entrar como empleador
                 </Button>
               </Link>
             </div>
@@ -86,24 +67,23 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-3">
           {[
             {
               icon: MapPin,
               title: "Geolocalización",
-              desc: "Empleos ordenados por proximidad a tu ubicación actual o seleccionada.",
+              desc: "Empleos ordenados por proximidad a tu ubicación.",
             },
             {
               icon: Zap,
               title: "3 clics para postular",
-              desc: "Perfil completo, un clic en Postularme y listo. Sin formularios eternos.",
+              desc: "Entra como candidato demo y postúlate al instante.",
             },
             {
               icon: Shield,
-              title: "Seguro y confiable",
-              desc: "Perfiles verificados, gestión de candidatos y mensajería interna.",
+              title: "Sin configuración",
+              desc: "Datos demo incluidos. Funciona en Vercel sin base de datos.",
             },
           ].map((feature) => (
             <GlassCard key={feature.title} hover className="p-6">
@@ -119,16 +99,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Jobs */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-display text-2xl font-bold text-gray-900 sm:text-3xl">
               Empleos destacados
             </h2>
-            <p className="mt-2 text-gray-500">
-              Oportunidades cerca de Bogotá
-            </p>
+            <p className="mt-2 text-gray-500">Oportunidades cerca de Bogotá</p>
           </div>
           <Link
             href="/jobs"
@@ -142,36 +119,23 @@ export default async function HomePage() {
             <JobCard key={job.id} job={job} />
           ))}
         </div>
-        <div className="mt-8 text-center sm:hidden">
-          <Link href="/jobs">
-            <Button variant="secondary">Ver todos los empleos</Button>
-          </Link>
-        </div>
       </section>
 
-      {/* CTA */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <GlassCard className="relative overflow-hidden p-8 sm:p-12">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary-100/50 blur-3xl" />
           <div className="relative flex flex-col items-center text-center">
             <Users className="h-12 w-12 text-primary-500" />
-            <h2 className="mt-4 font-display text-2xl font-bold text-gray-900 sm:text-3xl">
-              ¿Listo para dar el siguiente paso?
+            <h2 className="mt-4 font-display text-2xl font-bold text-gray-900">
+              Prueba la demo
             </h2>
             <p className="mt-3 max-w-lg text-gray-500">
-              Únete a miles de profesionales y empresas que ya confían en
-              Work Go para conectar talento local.
+              Entra como empleador o candidato con un clic. Sin contraseñas.
             </p>
-            <div className="mt-6 flex gap-3">
-              <Link href="/register?role=candidate">
-                <Button size="lg">Busco empleo</Button>
-              </Link>
-              <Link href="/register?role=employer">
-                <Button variant="secondary" size="lg">
-                  Soy empleador
-                </Button>
-              </Link>
-            </div>
+            <Link href="/login">
+              <Button size="lg" className="mt-6">
+                Entrar a Work Go
+              </Button>
+            </Link>
           </div>
         </GlassCard>
       </section>

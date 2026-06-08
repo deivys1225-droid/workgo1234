@@ -19,9 +19,10 @@ export interface JobWithDistance {
   employer?: {
     profile?: {
       fullName: string;
-      companyName: string | null;
-      avatarUrl: string | null;
-    } | null;
+      companyName?: string | null;
+      avatarUrl?: string | null;
+      bio?: string | null;
+    };
   };
 }
 

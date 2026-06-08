@@ -1,13 +1,12 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "work-go-dev-secret"
-);
+const JWT_SECRET = new TextEncoder().encode("work-go-demo-secret");
 
 export interface SessionPayload {
   userId: string;
   email: string;
+  fullName: string;
   role: "employer" | "candidate";
 }
 

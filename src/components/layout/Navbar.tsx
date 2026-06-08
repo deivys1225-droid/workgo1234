@@ -2,23 +2,16 @@ import Link from "next/link";
 import {
   Briefcase,
   Bell,
-  LogOut,
   User,
   LayoutDashboard,
 } from "lucide-react";
 import { getSession } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { unreadNotificationCount } from "@/lib/store";
 import { NavbarClient } from "./NavbarClient";
 
 export async function Navbar() {
   const session = await getSession();
-  let unreadCount = 0;
-
-  if (session) {
-    unreadCount = await prisma.notification.count({
-      where: { userId: session.userId, read: false },
-    });
-  }
+  const unreadCount = session ? unreadNotificationCount(session.userId) : 0;
 
   return (
     <header className="sticky top-0 z-50 glass-strong border-b border-white/30">
@@ -33,25 +26,16 @@ export async function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          <Link
-            href="/jobs"
-            className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600"
-          >
+          <Link href="/jobs" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600">
             Empleos
           </Link>
           {session?.role === "employer" && (
-            <Link
-              href="/dashboard/employer"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600"
-            >
+            <Link href="/dashboard/employer" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600">
               Panel empleador
             </Link>
           )}
           {session?.role === "candidate" && (
-            <Link
-              href="/dashboard/candidate"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600"
-            >
+            <Link href="/dashboard/candidate" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600">
               Mis postulaciones
             </Link>
           )}
@@ -61,11 +45,7 @@ export async function Navbar() {
           {session ? (
             <>
               <Link
-                href={
-                  session.role === "employer"
-                    ? "/dashboard/employer/notifications"
-                    : "/dashboard/candidate/notifications"
-                }
+                href={session.role === "employer" ? "/dashboard/employer/notifications" : "/dashboard/candidate/notifications"}
                 className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600"
               >
                 <Bell className="h-5 w-5" />
@@ -76,21 +56,13 @@ export async function Navbar() {
                 )}
               </Link>
               <Link
-                href={
-                  session.role === "employer"
-                    ? "/dashboard/employer/profile"
-                    : "/dashboard/candidate/profile"
-                }
+                href={session.role === "employer" ? "/dashboard/employer/profile" : "/dashboard/candidate/profile"}
                 className="hidden rounded-lg p-2 text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600 sm:block"
               >
                 <User className="h-5 w-5" />
               </Link>
               <Link
-                href={
-                  session.role === "employer"
-                    ? "/dashboard/employer"
-                    : "/dashboard/candidate"
-                }
+                href={session.role === "employer" ? "/dashboard/employer" : "/dashboard/candidate"}
                 className="hidden rounded-lg p-2 text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600 sm:block"
               >
                 <LayoutDashboard className="h-5 w-5" />
@@ -99,17 +71,11 @@ export async function Navbar() {
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="rounded-xl px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600"
-              >
-                Iniciar sesión
+              <Link href="/login" className="rounded-xl px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-primary-600">
+                Entrar
               </Link>
-              <Link
-                href="/register"
-                className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-700 hover:shadow-primary-600/40"
-              >
-                Registrarse
+              <Link href="/jobs" className="rounded-xl bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-primary-600/25 transition-all hover:bg-primary-700">
+                Empleos
               </Link>
             </>
           )}

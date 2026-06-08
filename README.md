@@ -1,50 +1,36 @@
 # Work Go
 
-Plataforma de contratación local inteligente con geolocalización en tiempo real.
+Marketplace de empleos local — **proyecto escolar demo**. Sin base de datos, sin registro real.
 
-## Desplegar en internet (sin depender de tu PC)
+## Demo en internet
 
-Guía completa en **[DEPLOY.md](./DEPLOY.md)** — Vercel + Neon PostgreSQL (gratis).
+1. Conecta el repo en **https://vercel.com** (importa `deivys1225-droid/workgo1234`)
+2. Clic en **Deploy** — no necesitas variables de entorno
+3. Tu URL: `https://workgo1234-a6gq.vercel.app`
 
-Resumen:
-1. Crea base de datos en **https://neon.tech**
-2. Importa el repo en **https://vercel.com** → conecta GitHub
-3. Agrega variables `DATABASE_URL` y `JWT_SECRET`
-4. Deploy → tu app queda en `https://tu-proyecto.vercel.app`
-
-## Inicio rápido (local)
+## Probar localmente
 
 ```bash
 npm install
-npm run db:push
-npm run db:seed
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000)
+Abre http://localhost:3000
 
-## Cuentas demo
+## Cómo usar la demo
 
-| Rol | Email | Contraseña |
-|-----|-------|------------|
-| Empleador | empleador@workgo.com | demo1234 |
-| Candidato | candidato@workgo.com | demo1234 |
+1. **Ver empleos** → `/jobs` (mapa + lista por proximidad)
+2. **Entrar** → `/login` → elige empleador o candidato (sin contraseña)
+3. **Postularse** → entra como candidato → abre un empleo → Postularme
+4. **Panel empleador** → ver postulaciones, aceptar/rechazar
 
 ## Stack
 
-- **Next.js 15** + TypeScript + Tailwind CSS v4
-- **Prisma** + SQLite (local, sin configuración externa)
-- **Leaflet** + OpenStreetMap (mapas sin API key)
-- **JWT** auth con cookies httpOnly
-- Glassmorphism UI
+Next.js 15 · Tailwind CSS · Leaflet · Datos demo en memoria
 
-## Funcionalidades
+## APK móvil
 
-- Registro/login por roles (empleador / candidato)
-- Publicar y buscar empleos por proximidad geográfica
-- Mapa interactivo + lista ordenada por distancia
-- Postulación en 3 clics con envío automático de perfil
-- Panel empleador: gestionar candidatos, aceptar/rechazar
-- Panel candidato: ver postulaciones, editar perfil, subir CV
-- Chat interno por postulación
-- Notificaciones de nuevas postulaciones
+```bash
+$env:CAPACITOR_SERVER_URL="https://tu-url.vercel.app"
+npm run apk:build
+```

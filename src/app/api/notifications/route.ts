@@ -1,44 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { getNotifications, markNotificationsRead } from "@/lib/store";
 
 export async function GET() {
   const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
-  const notifications = await prisma.notification.findMany({
-    where: { userId: session.userId },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-
-  return NextResponse.json({ notifications });
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  return NextResponse.json({ notifications: getNotifications(session.userId) });
 }
 
 export async function PATCH(req: NextRequest) {
   const session = await getSession();
-  if (!session) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
-
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const { id, markAllRead } = await req.json();
-
   if (markAllRead) {
-    await prisma.notification.updateMany({
-      where: { userId: session.userId, read: false },
-      data: { read: true },
-    });
-    return NextResponse.json({ ok: true });
+    markNotificationsRead(session.userId);
+  } else if (id) {
+    markNotificationsRead(session.userId, id);
   }
-
-  if (id) {
-    await prisma.notification.update({
-      where: { id },
-      data: { read: true },
-    });
-  }
-
   return NextResponse.json({ ok: true });
 }

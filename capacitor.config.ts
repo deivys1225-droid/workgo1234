@@ -15,6 +15,17 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
   },
+  plugins: {
+    StatusBar: {
+      overlaysWebView: false,
+      backgroundColor: "#ffffff",
+      style: "DARK",
+    },
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#eff6ff",
+    },
+  },
 };
 
 export default config;

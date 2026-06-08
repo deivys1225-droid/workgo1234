@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { CapacitorInit } from "@/components/CapacitorInit";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
@@ -32,8 +33,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  viewportFit: "cover",
   themeColor: "#2563eb",
 };
 
@@ -48,6 +48,7 @@ export default function RootLayout({
         className={`${inter.variable} ${jakarta.variable} font-sans antialiased`}
       >
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-white">
+          <CapacitorInit />
           <Navbar />
           <main>{children}</main>
           <Footer />

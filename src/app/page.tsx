@@ -11,9 +11,34 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { FeatureCard } from "@/components/home/FeatureCard";
 import { getJobs } from "@/lib/store";
-import { getDistanceMeters, DEFAULT_LOCATION } from "@/lib/geo";
+import { DEFAULT_LOCATION } from "@/lib/geo";
 import { JobCard } from "@/components/jobs/JobCard";
+
+const FEATURES = [
+  {
+    icon: MapPin,
+    title: "Geolocalización",
+    desc: "Empleos ordenados por proximidad a tu ubicación actual o seleccionada.",
+    image:
+      "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&h=480&fit=crop&q=80",
+  },
+  {
+    icon: Zap,
+    title: "3 clics para postular",
+    desc: "Perfil completo, un clic en Postularme y listo. Sin formularios eternos.",
+    image:
+      "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=480&fit=crop&q=80",
+  },
+  {
+    icon: Shield,
+    title: "Seguro y confiable",
+    desc: "Perfiles verificados, gestión de candidatos y mensajería interna.",
+    image:
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=480&fit=crop&q=80",
+  },
+];
 
 export default function HomePage() {
   const jobsWithDistance = getJobs({
@@ -35,29 +60,29 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-white/90 to-white" />
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32">
+        <div className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 sm:pt-16 sm:pb-20 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 text-sm text-primary-600">
               <Zap className="h-4 w-4" />
               Proyecto escolar — contratación local
             </div>
-            <h1 className="font-display text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            <h1 className="font-display text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
               Encuentra empleos{" "}
               <span className="text-primary-600">cerca de ti</span>
             </h1>
-            <p className="mt-6 text-lg text-gray-600 leading-relaxed">
+            <p className="mt-5 text-base text-gray-600 leading-relaxed sm:text-lg">
               Work Go conecta empleadores con talento local usando
               geolocalización. Demo interactiva sin base de datos ni registro.
             </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link href="/jobs">
-                <Button size="lg" className="gap-2">
+            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center sm:gap-4">
+              <Link href="/jobs" className="w-full sm:w-auto">
+                <Button size="lg" className="gap-2 w-full sm:w-auto">
                   <Search className="h-5 w-5" />
                   Buscar empleos
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button variant="secondary" size="lg" className="gap-2">
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="gap-2 w-full sm:w-auto">
                   <Briefcase className="h-5 w-5" />
                   Entrar como empleador
                 </Button>
@@ -67,39 +92,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: MapPin,
-              title: "Geolocalización",
-              desc: "Empleos ordenados por proximidad a tu ubicación.",
-            },
-            {
-              icon: Zap,
-              title: "3 clics para postular",
-              desc: "Entra como candidato demo y postúlate al instante.",
-            },
-            {
-              icon: Shield,
-              title: "Sin configuración",
-              desc: "Datos demo incluidos. Funciona en Vercel sin base de datos.",
-            },
-          ].map((feature) => (
-            <GlassCard key={feature.title} hover className="p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600">
-                <feature.icon className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 font-display text-lg font-semibold text-gray-900">
-                {feature.title}
-              </h3>
-              <p className="mt-2 text-sm text-gray-500">{feature.desc}</p>
-            </GlassCard>
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mb-8 text-center sm:mb-10">
+          <h2 className="font-display text-2xl font-bold text-gray-900 sm:text-3xl">
+            ¿Por qué Work Go?
+          </h2>
+          <p className="mt-2 text-gray-500">
+            Funciones clave de la plataforma
+          </p>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} />
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-display text-2xl font-bold text-gray-900 sm:text-3xl">
@@ -119,9 +128,14 @@ export default function HomePage() {
             <JobCard key={job.id} job={job} />
           ))}
         </div>
+        <div className="mt-6 text-center sm:hidden">
+          <Link href="/jobs">
+            <Button variant="secondary">Ver todos los empleos</Button>
+          </Link>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <GlassCard className="relative overflow-hidden p-8 sm:p-12">
           <div className="relative flex flex-col items-center text-center">
             <Users className="h-12 w-12 text-primary-500" />

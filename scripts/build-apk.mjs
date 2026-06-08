@@ -1,9 +1,10 @@
 /**
- * Genera APK de Work Go apuntando al servidor en tu PC (misma red WiFi).
+ * Genera APK de Work Go.
  *
  * Uso:
- *   node scripts/build-apk.mjs
- *   node scripts/build-apk.mjs 192.168.1.50
+ *   node scripts/build-apk.mjs                                          → IP local (dev)
+ *   node scripts/build-apk.mjs https://workgo1234-a6gq.vercel.app       → producción
+ *   CAPACITOR_SERVER_URL=https://... npm run apk:build                  → producción
  */
 import { execSync } from "child_process";
 import { networkInterfaces } from "os";
@@ -50,8 +51,10 @@ function getLocalIp() {
   return "192.168.1.1";
 }
 
-const ip = process.argv[2] || getLocalIp();
-const serverUrl = `http://${ip}:3000`;
+const arg = process.argv[2];
+const serverUrl =
+  process.env.CAPACITOR_SERVER_URL ||
+  (arg?.startsWith("http") ? arg : arg ? `http://${arg}:3000` : `http://${getLocalIp()}:3000`);
 
 console.log("\n📱 Work Go — Build APK");
 console.log("─────────────────────────────");
@@ -106,9 +109,14 @@ try {
   console.log(`   ${apkPath}`);
   console.log("\n📋 Pasos para usar en el celular:");
   console.log("   1. Copia la APK al teléfono e instálala");
-  console.log("   2. En la PC ejecuta: npm run dev:mobile");
-  console.log(`   3. Celular y PC en la misma red WiFi`);
-  console.log(`   4. La app se conectará a ${serverUrl}\n`);
+  if (serverUrl.includes("vercel.app") || serverUrl.startsWith("https://")) {
+    console.log("   2. Abre la app — funciona con internet, sin PC");
+    console.log(`   3. Conecta a ${serverUrl}\n`);
+  } else {
+    console.log("   2. En la PC ejecuta: npm run dev:mobile");
+    console.log("   3. Celular y PC en la misma red WiFi");
+    console.log(`   4. La app se conectará a ${serverUrl}\n`);
+  }
 } catch (err) {
   console.error("\n❌ Error al generar APK:", err.message);
   console.log("\nRequisitos:");

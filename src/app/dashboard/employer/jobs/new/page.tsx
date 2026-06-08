@@ -87,7 +87,7 @@ export default function NewJobPage() {
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <Input
             label="Título del empleo"
-            placeholder="Ej: Desarrollador Frontend"
+            placeholder="Ej: Mesero/a, Auxiliar de bodega"
             value={form.title}
             onChange={(e) => update("title", e.target.value)}
             required

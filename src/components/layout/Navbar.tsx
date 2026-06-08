@@ -14,8 +14,8 @@ export async function Navbar() {
   const unreadCount = session ? unreadNotificationCount(session.userId) : 0;
 
   return (
-    <header className="sticky top-0 z-50 glass-strong border-b border-white/30">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 glass-strong border-b border-white/30 safe-header">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 sm:py-3 lg:px-8">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/30 transition-transform group-hover:scale-105">
             <Briefcase className="h-5 w-5" />

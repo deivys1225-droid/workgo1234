@@ -66,7 +66,7 @@ function EnterPage() {
             <div className="text-left">
               <div className="font-semibold">Soy empleador</div>
               <div className="text-xs opacity-80 font-normal">
-                Entrar como TechCorp Colombia
+                Entrar como Almacén La 14 (empleador)
               </div>
             </div>
           </Button>

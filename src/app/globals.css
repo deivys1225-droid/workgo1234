@@ -17,6 +17,7 @@
 
 body {
   font-family: var(--font-sans);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 h1, h2, h3, h4 {
@@ -52,6 +53,10 @@ h1, h2, h3, h4 {
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+}
+
+.safe-header {
+  padding-top: max(2.75rem, calc(env(safe-area-inset-top, 0px) + 1.25rem));
 }
 
 /* Leaflet overrides */
